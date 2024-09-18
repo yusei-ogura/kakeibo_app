@@ -1,0 +1,80 @@
+buildscript {
+	dependencies {
+		classpath 'com.h2database:h2:2.1.214'
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.domaframework.doma.codegen' version '2.0.0'
+	id 'org.domaframework.doma.compile' version '2.0.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.seasar.doma:doma-core:2.44.2'
+	implementation 'org.seasar.doma.boot:doma-spring-boot-starter:1.7.0'
+	annotationProcessor 'org.seasar.doma:doma-processor:2.44.2'
+	implementation 'com.h2database:h2:2.1.214'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+domaCodeGen {
+	dev {
+		url = 'jdbc:h2:file:~/h2/kakeibo'
+		user = 'sa'
+		password = 'password'
+		schemaName = 'kakeibo'
+		tableNamePattern = '.*'
+		templateDir = file('doma/template')
+		entity {
+			packageName = 'com.example.kakeibo.repository.entity'
+			useListener = false
+			useMetamodel = false
+			useMappedSuperclass = false
+			showDbComment = true
+		}
+		dao {
+			packageName = 'com.example.kakeibo.repository.dao'
+		}
+	}
+}
+
+bootJar {
+	mainClass.set('com.example.kakeibo.KakeiboApplication')
+}
+
+bootRun {
+	mainClass.set('com.example.kakeibo.KakeiboApplication')
+}
