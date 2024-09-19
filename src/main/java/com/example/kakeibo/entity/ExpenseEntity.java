@@ -10,34 +10,41 @@ import org.seasar.doma.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 @Entity
-@Table(name = "expense")
+@Table(name = "kakeibo.expense")
 public class ExpenseEntity {
 
+    /** 支出ID */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "expense_id")
     private Integer expenseId;
 
+    /** 金額 */
     @Column(name = "amount")
     private Integer amount;
 
+    /** カテゴリーID */
     @Column(name = "category_id")
     private Integer categoryId;
 
+    /** メモ */
     @Column(name = "memo")
     private String memo;
 
+    /** 支払日 */
     @Column(name = "payment_date")
     private LocalDate paymentDate;
 
+    /** 作成日 */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    /** 更新日 */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Getter & Setter
     public Integer getExpenseId() {
         return expenseId;
     }
@@ -93,4 +100,5 @@ public class ExpenseEntity {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
