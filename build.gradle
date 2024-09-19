@@ -78,3 +78,4 @@ bootJar {
 bootRun {
 	mainClass.set('com.example.kakeibo.KakeiboApplication')
 }
+
