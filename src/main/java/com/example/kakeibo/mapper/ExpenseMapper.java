@@ -9,9 +9,9 @@ import org.mapstruct.Mapping;
 public interface ExpenseMapper {
 
     /**
-     * ExpenseEntity を ExpenseDto に変換する
-     * @param expenseEntity 支出一覧エンティティ
-     * @return 支出一覧Dto
+     * 支出エンティティを支出Dtoに変換する
+     * @param expenseEntity 支出エンティティ
+     * @return 支出Dto
      */
     @Mapping(source = "expenseId", target = "expenseId")
     @Mapping(source = "amount", target = "amount")
@@ -21,6 +21,5 @@ public interface ExpenseMapper {
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "updatedAt", target = "updatedAt")
     ExpenseDto toDto(ExpenseEntity expenseEntity);
+
 }
-
-

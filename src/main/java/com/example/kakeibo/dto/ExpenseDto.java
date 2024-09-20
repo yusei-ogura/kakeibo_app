@@ -6,6 +6,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 支出DTO
+ */
 @Getter
 @Setter
 public class ExpenseDto {
@@ -19,6 +22,9 @@ public class ExpenseDto {
     /** カテゴリID */
     private Integer categoryId;
 
+    /** カテゴリ名 */
+    private String categoryName;
+
     /** メモ */
     private String memo;
 
@@ -30,4 +36,5 @@ public class ExpenseDto {
 
     /** 更新日時 */
     private LocalDateTime updatedAt;
+
 }

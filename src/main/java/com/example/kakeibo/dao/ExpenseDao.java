@@ -34,4 +34,5 @@ public interface ExpenseDao {
     /** 支出を削除する */
     @Delete
     int delete(ExpenseEntity entity);
+
 }

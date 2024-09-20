@@ -1,10 +1,14 @@
 package com.example.kakeibo.controller;
 
 import com.example.kakeibo.dto.ExpenseDto;
+import com.example.kakeibo.exception.CategoryDeletionException;
+import com.example.kakeibo.exception.ExpenseDeletionException;
+import com.example.kakeibo.form.ExpenseForm;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.service.ExpenseService;
 import com.example.kakeibo.util.DateUtil;
+import com.example.kakeibo.util.ValidationErrorUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +50,8 @@ public class ExpenseController {
 
         try {
             List<ExpenseDto> expenseListDto = expenseService.findExpenseListByMonth(targetMonth);
-            return ResponseEntity.ok(expenseListDto);
+            ExpenseForm form = expenseService.createExpenseForm(expenseListDto);
+            return ResponseEntity.ok(form);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
         }
@@ -59,8 +64,9 @@ public class ExpenseController {
      */
     @PostMapping("/register")
     public ResponseEntity<String> registerExpense(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("入力エラー: " + result.getAllErrors().toString());
+        String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
+        if (!errorMessage.isEmpty()) {
+            return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
         }
 
         try {
@@ -79,15 +85,16 @@ public class ExpenseController {
      */
     @PostMapping("/edit/{expenseId}")
     public ResponseEntity<String> editExpense(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("入力エラー: " + result.getAllErrors().toString());
+        String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
+        if (!errorMessage.isEmpty()) {
+            return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
         }
 
         try {
             expenseService.editExpense(expenseId, request);
             return ResponseEntity.ok("支出が編集されました");
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
         }
@@ -105,8 +112,11 @@ public class ExpenseController {
             return ResponseEntity.ok("支出が削除されました");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (ExpenseDeletionException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
         }
     }
+
 }

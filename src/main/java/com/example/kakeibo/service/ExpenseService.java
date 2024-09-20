@@ -6,6 +6,9 @@ import com.example.kakeibo.entity.ExpenseEntity;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.ExpenseEditException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
+import com.example.kakeibo.form.CategoryForm;
+import com.example.kakeibo.form.ExpenseForm;
+import com.example.kakeibo.form.ItemForm;
 import com.example.kakeibo.mapper.ExpenseMapper;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
@@ -13,15 +16,20 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
 
+    private final CategoryService categoryService;
     private final ExpenseDao expenseDao;
     private final ExpenseMapper expenseMapper;
 
@@ -36,7 +44,12 @@ public class ExpenseService {
 
         List<ExpenseEntity> expenseList = expenseDao.selectByYearAndMonth(year, month);
         return expenseList.stream()
-                .map(expenseMapper::toDto)
+                .map(expense -> {
+                    ExpenseDto dto = expenseMapper.toDto(expense);
+                    String categoryName = categoryService.getCategoryName(expense.getCategoryId());
+                    dto.setCategoryName(categoryName);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -45,6 +58,8 @@ public class ExpenseService {
      * @param request 支出登録リクエスト
      */
     public void registerExpense(ExpenseRegisterRequest request) {
+        categoryService.findCategoryById(request.getCategoryId());
+
         ExpenseEntity entity = new ExpenseEntity();
         entity.setAmount(request.getAmount());
         entity.setCategoryId(request.getCategoryId());
@@ -65,9 +80,10 @@ public class ExpenseService {
      * @param request 支出編集リクエスト
      */
     public void editExpense(Integer expenseId, ExpenseEditRequest request) {
+        categoryService.findCategoryById(request.getCategoryId());
+
         ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
                 .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
-
         existingEntity.setAmount(request.getAmount());
         existingEntity.setCategoryId(request.getCategoryId());
         existingEntity.setMemo(request.getMemo());
@@ -92,4 +108,25 @@ public class ExpenseService {
             throw new ExpenseDeletionException("支出の削除に失敗しました");
         }
     }
+
+    /**
+     * 支出Dtoを基に支出一覧Formを生成する
+     * @param expenseListDto 支出Dto
+     * @return 支出一覧Form
+     */
+    public ExpenseForm createExpenseForm(List<ExpenseDto> expenseListDto) {
+        Map<String, CategoryForm> categoryMap = new HashMap<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (ExpenseDto dto : expenseListDto) {
+            String categoryName = dto.getCategoryName();
+            CategoryForm categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryForm(BigDecimal.ZERO, new ArrayList<>()));
+            BigDecimal amount = BigDecimal.valueOf(dto.getAmount());
+            categoryForm.setTotalAmount(categoryForm.getTotalAmount().add(amount));
+            categoryForm.getItems().add(new ItemForm(dto.getExpenseId(), dto.getMemo(), amount));
+            totalAmount = totalAmount.add(amount);
+        }
+        return new ExpenseForm(totalAmount, categoryMap);
+    }
+
 }

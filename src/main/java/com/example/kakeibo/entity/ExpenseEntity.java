@@ -10,7 +10,9 @@ import org.seasar.doma.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
+/**
+ * 支出Entity
+ */
 @Entity
 @Table(name = "kakeibo.expense")
 public class ExpenseEntity {

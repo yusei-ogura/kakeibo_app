@@ -4,4 +4,5 @@ public class ExpenseDeletionException extends RuntimeException {
     public ExpenseDeletionException(String message) {
         super(message);
     }
+
 }

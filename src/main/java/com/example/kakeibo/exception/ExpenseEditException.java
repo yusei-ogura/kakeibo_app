@@ -4,4 +4,5 @@ public class ExpenseEditException extends RuntimeException {
     public ExpenseEditException(String message) {
         super(message);
     }
+
 }

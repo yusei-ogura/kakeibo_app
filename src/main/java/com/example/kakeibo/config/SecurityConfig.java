@@ -1,4 +1,5 @@
-package com.example.demo.config;
+package com.example.kakeibo.config;
 
 public class SecurityConfig {
+
 }
