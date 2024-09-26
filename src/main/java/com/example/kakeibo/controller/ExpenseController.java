@@ -8,6 +8,7 @@ import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.service.ExpenseService;
 import com.example.kakeibo.util.DateUtil;
 import com.example.kakeibo.util.ValidationErrorUtil;
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class ExpenseController {
      */
     @GetMapping
     public ResponseEntity<Object> getExpensesByMonth(@RequestParam String yearMonth) {
-        if (yearMonth == null || yearMonth.isEmpty()) {
+        if (StringUtils.isEmpty(yearMonth)) {
             return ResponseEntity.badRequest().body("対象月を入力してください");
         }
 
