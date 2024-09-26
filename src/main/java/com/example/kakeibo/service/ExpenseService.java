@@ -50,7 +50,7 @@ public class ExpenseService {
                     dto.setCategoryName(categoryName);
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
