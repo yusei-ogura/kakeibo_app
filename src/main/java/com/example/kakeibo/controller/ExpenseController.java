@@ -62,7 +62,7 @@ public class ExpenseController {
      * @param request リクエストボディ：支出登録情報
      * @return 登録結果
      */
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<String> registerExpense(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {

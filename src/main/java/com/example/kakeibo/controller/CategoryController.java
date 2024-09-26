@@ -46,7 +46,7 @@ public class CategoryController {
      * @param request リクエストボディ：カテゴリー登録情報
      * @return 登録結果
      */
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<String> registerCategory(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
