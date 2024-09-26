@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -64,18 +65,17 @@ public class CategoryController {
     /**
      * カテゴリーを削除する
      * @param categoryId カテゴリーID
-     * @return 削除結果
      */
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Integer categoryId) {
+    public void deleteCategory(@PathVariable Integer categoryId) {
         try {
             categoryService.deleteCategory(categoryId);
-            return ResponseEntity.ok("カテゴリーが削除されました");
         } catch (CategoryDeletionException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
         }
     }
 
 }
+

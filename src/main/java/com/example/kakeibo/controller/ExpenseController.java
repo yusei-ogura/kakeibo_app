@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -81,41 +82,37 @@ public class ExpenseController {
      * 支出を編集する
      * @param expenseId 支出ID
      * @param request リクエストボディ：支出編集情報
-     * @return 編集結果
      */
     @PostMapping("/edit/{expenseId}")
-    public ResponseEntity<String> editExpense(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
+    public void editExpense(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
-            return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "【エラー】\n" + errorMessage);
         }
 
         try {
             expenseService.editExpense(expenseId, request);
-            return ResponseEntity.ok("支出が編集されました");
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
         }
     }
 
     /**
      * 支出を削除する
      * @param expenseId 支出ID
-     * @return 削除結果
      */
     @DeleteMapping("/{expenseId}")
-    public ResponseEntity<String> deleteExpense(@PathVariable Integer expenseId) {
+    public void deleteExpense(@PathVariable Integer expenseId) {
         try {
             expenseService.deleteExpense(expenseId);
-            return ResponseEntity.ok("支出が削除されました");
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ExpenseDeletionException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
         }
     }
 
