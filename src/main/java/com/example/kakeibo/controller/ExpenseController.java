@@ -3,6 +3,7 @@ package com.example.kakeibo.controller;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.form.ExpenseForm;
+import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.service.ExpenseService;
 import com.example.kakeibo.util.DateUtil;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +27,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/expense")
+@RequestMapping("/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -103,7 +105,7 @@ public class ExpenseController {
      * @param expenseId 支出ID
      * @return 削除結果
      */
-    @PostMapping("/delete/{expenseId}")
+    @DeleteMapping("/{expenseId}")
     public ResponseEntity<String> deleteExpense(@PathVariable Integer expenseId) {
         try {
             expenseService.deleteExpense(expenseId);
