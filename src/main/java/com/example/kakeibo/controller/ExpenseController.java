@@ -2,6 +2,7 @@ package com.example.kakeibo.controller;
 
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.exception.ExpenseDeletionException;
+import com.example.kakeibo.exception.InvalidYearMonthException;
 import com.example.kakeibo.form.ExpenseForm;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
@@ -46,15 +47,13 @@ public class ExpenseController {
             return ResponseEntity.badRequest().body("対象月を入力してください");
         }
 
-        YearMonth targetMonth = DateUtil.parseYearMonth(yearMonth);
-        if (targetMonth == null) {
-            return ResponseEntity.badRequest().body("無効な年月のフォーマットです");
-        }
-
         try {
+            YearMonth targetMonth = DateUtil.parseYearMonth(yearMonth);
             List<ExpenseDto> expenseListDto = expenseService.findExpensesByMonth(targetMonth);
             ExpenseForm form = expenseService.createExpenseForm(expenseListDto);
             return ResponseEntity.ok(form);
+        } catch (InvalidYearMonthException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
         }

@@ -1,5 +1,7 @@
 package com.example.kakeibo.util;
 
+import com.example.kakeibo.exception.InvalidYearMonthException;
+
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 
@@ -18,7 +20,7 @@ public class DateUtil {
         try {
             return YearMonth.parse(yearMonth);
         } catch (DateTimeParseException e) {
-            return null;
+            throw new InvalidYearMonthException("無効な年月のフォーマットです: " + yearMonth);
         }
     }
 
