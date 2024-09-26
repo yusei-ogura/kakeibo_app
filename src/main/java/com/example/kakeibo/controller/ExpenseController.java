@@ -50,7 +50,7 @@ public class ExpenseController {
         }
 
         try {
-            List<ExpenseDto> expenseListDto = expenseService.findExpenseListByMonth(targetMonth);
+            List<ExpenseDto> expenseListDto = expenseService.findExpensesByMonth(targetMonth);
             ExpenseForm form = expenseService.createExpenseForm(expenseListDto);
             return ResponseEntity.ok(form);
         } catch (Exception e) {
@@ -64,14 +64,14 @@ public class ExpenseController {
      * @return 登録結果
      */
     @PostMapping
-    public ResponseEntity<String> registerExpense(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
+    public ResponseEntity<String> register(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
             return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
         }
 
         try {
-            expenseService.registerExpense(request);
+            expenseService.register(request);
             return ResponseEntity.ok("支出が登録されました");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
@@ -84,14 +84,14 @@ public class ExpenseController {
      * @param request リクエストボディ：支出編集情報
      */
     @PostMapping("/edit/{expenseId}")
-    public void editExpense(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
+    public void edit(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "【エラー】\n" + errorMessage);
         }
 
         try {
-            expenseService.editExpense(expenseId, request);
+            expenseService.edit(expenseId, request);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
@@ -104,9 +104,9 @@ public class ExpenseController {
      * @param expenseId 支出ID
      */
     @DeleteMapping("/{expenseId}")
-    public void deleteExpense(@PathVariable Integer expenseId) {
+    public void delete(@PathVariable Integer expenseId) {
         try {
-            expenseService.deleteExpense(expenseId);
+            expenseService.delete(expenseId);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (ExpenseDeletionException e) {

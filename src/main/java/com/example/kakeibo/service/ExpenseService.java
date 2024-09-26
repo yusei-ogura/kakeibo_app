@@ -38,7 +38,7 @@ public class ExpenseService {
      * @param targetMonth 対象年月
      * @return 支出リストのDTO
      */
-    public List<ExpenseDto> findExpenseListByMonth(YearMonth targetMonth) {
+    public List<ExpenseDto> findExpensesByMonth(YearMonth targetMonth) {
         int year = targetMonth.getYear();
         int month = targetMonth.getMonthValue();
 
@@ -57,7 +57,7 @@ public class ExpenseService {
      * 支出を登録する
      * @param request 支出登録リクエスト
      */
-    public void registerExpense(ExpenseRegisterRequest request) {
+    public void register(ExpenseRegisterRequest request) {
         categoryService.findCategoryById(request.getCategoryId());
 
         ExpenseEntity entity = new ExpenseEntity();
@@ -79,7 +79,7 @@ public class ExpenseService {
      * @param expenseId 支出ID
      * @param request 支出編集リクエスト
      */
-    public void editExpense(Integer expenseId, ExpenseEditRequest request) {
+    public void edit(Integer expenseId, ExpenseEditRequest request) {
         categoryService.findCategoryById(request.getCategoryId());
 
         ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
@@ -100,7 +100,7 @@ public class ExpenseService {
      * 支出を削除する
      * @param expenseId 支出ID
      */
-    public void deleteExpense(Integer expenseId) {
+    public void delete(Integer expenseId) {
         ExpenseEntity entity = new ExpenseEntity();
         entity.setExpenseId(expenseId);
         int result = expenseDao.delete(entity);

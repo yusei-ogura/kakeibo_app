@@ -33,9 +33,9 @@ public class CategoryController {
      * @return カテゴリーリスト
      */
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategory() {
+    public ResponseEntity<List<CategoryDto>> getAll() {
         try {
-            List<CategoryDto> categories = categoryService.getAllCategory();
+            List<CategoryDto> categories = categoryService.getAll();
             return ResponseEntity.ok(categories);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -48,14 +48,14 @@ public class CategoryController {
      * @return 登録結果
      */
     @PostMapping
-    public ResponseEntity<String> registerCategory(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
+    public ResponseEntity<String> register(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
             return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
         }
 
         try {
-            categoryService.registerCategory(request);
+            categoryService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body("カテゴリーが登録されました");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
@@ -67,9 +67,9 @@ public class CategoryController {
      * @param categoryId カテゴリーID
      */
     @DeleteMapping("/{categoryId}")
-    public void deleteCategory(@PathVariable Integer categoryId) {
+    public void delete(@PathVariable Integer categoryId) {
         try {
-            categoryService.deleteCategory(categoryId);
+            categoryService.delete(categoryId);
         } catch (CategoryDeletionException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {

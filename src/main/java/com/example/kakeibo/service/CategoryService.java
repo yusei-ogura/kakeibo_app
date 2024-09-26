@@ -26,7 +26,7 @@ public class CategoryService {
      * カテゴリーリストを取得する
      * @return カテゴリーリストのDTO
      */
-    public List<CategoryDto> getAllCategory() {
+    public List<CategoryDto> getAll() {
         List<CategoryEntity> categoryList = categoryDao.selectAll();
         return categoryList.stream()
                 .filter(category -> !category.isDeleteFlg())
@@ -38,7 +38,7 @@ public class CategoryService {
      * カテゴリーを登録する
      * @param request カテゴリー登録リクエスト
      */
-    public void registerCategory(CategoryRegisterRequest request) {
+    public void register(CategoryRegisterRequest request) {
         CategoryEntity entity = new CategoryEntity();
         entity.setName(request.getName());
         entity.setCreatedAt(LocalDateTime.now());
@@ -55,7 +55,7 @@ public class CategoryService {
      * カテゴリーを削除する
      * @param categoryId カテゴリーID
      */
-    public void deleteCategory(Integer categoryId) {
+    public void delete(Integer categoryId) {
         CategoryEntity entity = findCategoryById(categoryId);
         entity.setDeleteFlg(true);
         int result = categoryDao.updateDeleteFlg(entity);
