@@ -37,7 +37,7 @@ public class CategoryController {
             List<CategoryDto> categories = categoryService.getAllCategory();
             return ResponseEntity.ok(categories);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
