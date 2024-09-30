@@ -1,18 +1,16 @@
 package com.example.kakeibo.response;
 
-import com.example.kakeibo.response.CategoryResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 /**
- * 支出一覧Form
+ * 支出一覧Response
  */
+@Getter
 public class ExpenseResponse {
-    @JsonProperty("totalAmount")
     private BigDecimal totalAmount;
-    @JsonProperty("categories")
     private Map<String, CategoryResponse> categories;
 
     public ExpenseResponse(BigDecimal totalAmount, Map<String, CategoryResponse> categories) {

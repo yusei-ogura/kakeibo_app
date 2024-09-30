@@ -1,15 +1,13 @@
 package com.example.kakeibo.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Getter
 public class ItemResponse {
-    @JsonProperty("expenseId")
     private Integer expenseId;
-    @JsonProperty("memo")
     private String memo;
-    @JsonProperty("amount")
     private BigDecimal amount;
 
     public ItemResponse(Integer expenseId, String memo, BigDecimal amount) {
