@@ -3,7 +3,7 @@ package com.example.kakeibo.controller;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.InvalidYearMonthException;
-import com.example.kakeibo.form.ExpenseForm;
+import com.example.kakeibo.response.ExpenseResponse;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.service.ExpenseService;
@@ -50,8 +50,8 @@ public class ExpenseController {
         try {
             YearMonth targetMonth = DateUtil.parseYearMonth(yearMonth);
             List<ExpenseDto> expenseListDto = expenseService.findExpensesByMonth(targetMonth);
-            ExpenseForm form = expenseService.createExpenseForm(expenseListDto);
-            return ResponseEntity.ok(form);
+            ExpenseResponse response = expenseService.createExpenseResponse(expenseListDto);
+            return ResponseEntity.ok(response);
         } catch (InvalidYearMonthException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

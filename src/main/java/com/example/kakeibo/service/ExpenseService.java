@@ -6,9 +6,9 @@ import com.example.kakeibo.entity.ExpenseEntity;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.ExpenseEditException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
-import com.example.kakeibo.form.CategoryForm;
-import com.example.kakeibo.form.ExpenseForm;
-import com.example.kakeibo.form.ItemForm;
+import com.example.kakeibo.response.CategoryResponse;
+import com.example.kakeibo.response.ExpenseResponse;
+import com.example.kakeibo.response.ItemResponse;
 import com.example.kakeibo.mapper.ExpenseMapper;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -114,19 +113,19 @@ public class ExpenseService {
      * @param expenseListDto 支出Dto
      * @return 支出一覧Form
      */
-    public ExpenseForm createExpenseForm(List<ExpenseDto> expenseListDto) {
-        Map<String, CategoryForm> categoryMap = new HashMap<>();
+    public ExpenseResponse createExpenseResponse(List<ExpenseDto> expenseListDto) {
+        Map<String, CategoryResponse> categoryMap = new HashMap<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (ExpenseDto dto : expenseListDto) {
             String categoryName = dto.getCategoryName();
-            CategoryForm categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryForm(BigDecimal.ZERO, new ArrayList<>()));
+            CategoryResponse categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryResponse(BigDecimal.ZERO, new ArrayList<>()));
             BigDecimal amount = BigDecimal.valueOf(dto.getAmount());
             categoryForm.setTotalAmount(categoryForm.getTotalAmount().add(amount));
-            categoryForm.getItems().add(new ItemForm(dto.getExpenseId(), dto.getMemo(), amount));
+            categoryForm.getItems().add(new ItemResponse(dto.getExpenseId(), dto.getMemo(), amount));
             totalAmount = totalAmount.add(amount);
         }
-        return new ExpenseForm(totalAmount, categoryMap);
+        return new ExpenseResponse(totalAmount, categoryMap);
     }
 
 }

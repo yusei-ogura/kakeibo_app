@@ -1,4 +1,4 @@
-package com.example.kakeibo.form;
+package com.example.kakeibo.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,13 +8,13 @@ import java.util.List;
 /**
  * カテゴリー一覧Form
  */
-public class CategoryForm {
+public class CategoryResponse {
     @JsonProperty("totalAmount")
     private BigDecimal totalAmount;
     @JsonProperty("items")
-    private List<ItemForm> items;
+    private List<ItemResponse> items;
 
-    public CategoryForm(BigDecimal totalAmount, List<ItemForm> items) {
+    public CategoryResponse(BigDecimal totalAmount, List<ItemResponse> items) {
         this.totalAmount = totalAmount;
         this.items = items;
     }
@@ -27,7 +27,7 @@ public class CategoryForm {
         this.totalAmount = totalAmount;
     }
 
-    public List<ItemForm> getItems() {
+    public List<ItemResponse> getItems() {
         return items;
     }
 
