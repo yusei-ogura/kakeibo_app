@@ -2,24 +2,19 @@ package com.example.kakeibo.mapper;
 
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.entity.ExpenseEntity;
+import com.example.kakeibo.service.CategoryService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
-public interface ExpenseMapper {
+@Component
+public abstract class ExpenseMapper {
 
-    /**
-     * 支出エンティティを支出Dtoに変換する
-     * @param expenseEntity 支出エンティティ
-     * @return 支出Dto
-     */
-    @Mapping(source = "expenseId", target = "expenseId")
-    @Mapping(source = "amount", target = "amount")
-    @Mapping(source = "categoryId", target = "categoryId")
-    @Mapping(source = "memo", target = "memo")
-    @Mapping(source = "paymentDate", target = "paymentDate")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "updatedAt", target = "updatedAt")
-    ExpenseDto toDto(ExpenseEntity expenseEntity);
+    @Autowired
+    protected CategoryService categoryService;
 
+    @Mapping(target = "categoryName", expression = "java(categoryService.getCategoryName(expenseEntity.getCategoryId()))")
+    public abstract ExpenseDto toDto(ExpenseEntity expenseEntity);
 }
