@@ -10,19 +10,19 @@ import java.util.List;
  */
 @Getter
 public class CategoryResponse {
-    private BigDecimal totalAmount;
+    private Integer totalAmount;
     private List<ItemResponse> items;
 
-    public CategoryResponse(BigDecimal totalAmount, List<ItemResponse> items) {
+    public CategoryResponse(Integer totalAmount, List<ItemResponse> items) {
         this.totalAmount = totalAmount;
         this.items = items;
     }
 
-    public BigDecimal getTotalAmount() {
+    public Integer getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(Integer totalAmount) {
         this.totalAmount = totalAmount;
     }
 

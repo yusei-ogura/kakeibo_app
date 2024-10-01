@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 public class ItemResponse {
     private Integer expenseId;
     private String memo;
-    private BigDecimal amount;
+    private Integer amount;
 
-    public ItemResponse(Integer expenseId, String memo, BigDecimal amount) {
+    public ItemResponse(Integer expenseId, String memo, Integer amount) {
         this.expenseId = expenseId;
         this.memo = memo;
         this.amount = amount;

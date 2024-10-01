@@ -110,15 +110,15 @@ public class ExpenseService {
      */
     public ExpenseResponse createExpenseResponse(List<ExpenseDto> expenseListDto) {
         Map<String, CategoryResponse> categoryMap = new HashMap<>();
-        BigDecimal totalAmount = BigDecimal.ZERO;
+        Integer totalAmount = 0;
 
         for (ExpenseDto dto : expenseListDto) {
             String categoryName = dto.getCategoryName();
-            CategoryResponse categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryResponse(BigDecimal.ZERO, new ArrayList<>()));
-            BigDecimal amount = BigDecimal.valueOf(dto.getAmount());
-            categoryForm.setTotalAmount(categoryForm.getTotalAmount().add(amount));
+            CategoryResponse categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryResponse(0, new ArrayList<>()));
+            Integer amount = dto.getAmount();
+            categoryForm.setTotalAmount(categoryForm.getTotalAmount() + amount);
             categoryForm.getItems().add(new ItemResponse(dto.getExpenseId(), dto.getMemo(), amount));
-            totalAmount = totalAmount.add(amount);
+            totalAmount += amount;
         }
         return new ExpenseResponse(totalAmount, categoryMap);
     }

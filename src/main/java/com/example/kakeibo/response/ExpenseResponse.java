@@ -10,10 +10,10 @@ import java.util.Map;
  */
 @Getter
 public class ExpenseResponse {
-    private BigDecimal totalAmount;
+    private Integer totalAmount;
     private Map<String, CategoryResponse> categories;
 
-    public ExpenseResponse(BigDecimal totalAmount, Map<String, CategoryResponse> categories) {
+    public ExpenseResponse(Integer totalAmount, Map<String, CategoryResponse> categories) {
         this.totalAmount = totalAmount;
         this.categories = categories;
     }
