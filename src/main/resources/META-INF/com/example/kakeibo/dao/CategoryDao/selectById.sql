@@ -8,3 +8,4 @@ FROM
     kakeibo.category
 WHERE
     category_id = /* categoryId */1
+    AND delete_flg = false

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,11 +71,8 @@ public class CategoryService {
      * @param categoryId カテゴリーID
      */
     public CategoryEntity findCategoryById(Integer categoryId) {
-        CategoryEntity category = categoryDao.selectById(categoryId);
-        if (category == null || category.isDeleteFlg()) {
-            throw new IllegalArgumentException("選択されたカテゴリが存在しません");
-        }
-        return category;
+        Optional<CategoryEntity> category = categoryDao.selectById(categoryId);
+        return category.orElseThrow(() -> new IllegalArgumentException("選択されたカテゴリが存在しません"));
     }
 
     /**
