@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -72,11 +73,11 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> delete(@PathVariable Integer categoryId) {
         try {
             categoryService.delete(categoryId);
+            return ResponseEntity.noContent().build();
         } catch (CategoryDeletionException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CategoryErrorDto(e.getMessage()));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
         }
     }
 
