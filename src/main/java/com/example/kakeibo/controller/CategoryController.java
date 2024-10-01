@@ -3,6 +3,9 @@ package com.example.kakeibo.controller;
 import com.example.kakeibo.dto.CategoryDto;
 import com.example.kakeibo.exception.CategoryDeletionException;
 import com.example.kakeibo.request.CategoryRegisterRequest;
+import com.example.kakeibo.response.ApiResponse;
+import com.example.kakeibo.response.CategoryListResponse;
+import com.example.kakeibo.response.errorDto.CategoryErrorDto;
 import com.example.kakeibo.service.CategoryService;
 import com.example.kakeibo.util.ValidationErrorUtil;
 import jakarta.validation.Valid;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,12 +35,13 @@ public class CategoryController {
      * @return カテゴリーリスト
      */
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAll() {
+    public ResponseEntity<ApiResponse> getAll() {
         try {
             List<CategoryDto> categories = categoryService.getAll();
-            return ResponseEntity.ok(categories);
+            return ResponseEntity.ok(new CategoryListResponse(categories));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
         }
     }
 
@@ -48,17 +51,18 @@ public class CategoryController {
      * @return 登録結果
      */
     @PostMapping
-    public ResponseEntity<String> register(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
-            return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
+            return ResponseEntity.badRequest().body(new CategoryErrorDto("【エラー】\n" + errorMessage));
         }
 
         try {
             categoryService.register(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body("カテゴリーが登録されました");
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CategoryErrorDto("カテゴリーが登録されました"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
         }
     }
 
@@ -67,15 +71,17 @@ public class CategoryController {
      * @param categoryId カテゴリーID
      */
     @DeleteMapping("/{categoryId}")
-    public void delete(@PathVariable Integer categoryId) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable Integer categoryId) {
         try {
             categoryService.delete(categoryId);
+            return ResponseEntity.noContent().build();
         } catch (CategoryDeletionException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CategoryErrorDto(e.getMessage()));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
         }
     }
 
 }
-
