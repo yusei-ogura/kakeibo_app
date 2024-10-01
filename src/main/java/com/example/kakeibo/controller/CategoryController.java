@@ -40,8 +40,7 @@ public class CategoryController {
             List<CategoryDto> categories = categoryService.getAll();
             return ResponseEntity.ok(new CategoryListResponse(categories));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -61,8 +60,7 @@ public class CategoryController {
             categoryService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(new CategoryErrorDto("カテゴリーが登録されました"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -79,8 +77,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new CategoryErrorDto(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CategoryErrorDto("サーバーエラーが発生しました"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
