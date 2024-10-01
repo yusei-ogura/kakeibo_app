@@ -1,13 +1,17 @@
 SELECT 
-    expense_id,
-    amount,
-    category_id,
-    memo,
-    payment_date,
-    created_at,
-    updated_at
+    e.expense_id,
+    e.amount,
+    e.category_id,
+    c.name AS category_name,
+    e.memo,
+    e.payment_date,
+    e.created_at,
+    e.updated_at
 FROM
-    kakeibo.expense
+    kakeibo.expense e
+INNER JOIN
+    kakeibo.category c ON e.category_id = c.category_id
 WHERE
-    YEAR(payment_date) = /* year */'2024'
-    AND MONTH(payment_date) = /* month */'8'
+    YEAR(e.payment_date) = /* year */'2024'
+    AND MONTH(e.payment_date) = /* month */'8'
+    AND c.delete_flg = false

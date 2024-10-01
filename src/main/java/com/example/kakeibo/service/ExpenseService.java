@@ -43,12 +43,7 @@ public class ExpenseService {
 
         List<ExpenseEntity> expenseList = expenseDao.selectByYearAndMonth(year, month);
         return expenseList.stream()
-                .map(expense -> {
-                    ExpenseDto dto = expenseMapper.toDto(expense);
-                    String categoryName = categoryService.getCategoryName(expense.getCategoryId());
-                    dto.setCategoryName(categoryName);
-                    return dto;
-                })
+                .map(expenseMapper::toDto)
                 .toList();
     }
 
@@ -109,9 +104,9 @@ public class ExpenseService {
     }
 
     /**
-     * 支出Dtoを基に支出一覧Formを生成する
+     * 支出Dtoを基に支出一覧Responseを生成する
      * @param expenseListDto 支出Dto
-     * @return 支出一覧Form
+     * @return 支出一覧Response
      */
     public ExpenseResponse createExpenseResponse(List<ExpenseDto> expenseListDto) {
         Map<String, CategoryResponse> categoryMap = new HashMap<>();

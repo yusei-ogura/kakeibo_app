@@ -75,14 +75,4 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("選択されたカテゴリが存在しません"));
     }
 
-    /**
-     * カテゴリーIDからカテゴリ名を取得する
-     * @param categoryId カテゴリーID
-     * @return カテゴリー名
-     */
-    public String getCategoryName(Integer categoryId) {
-        return categoryDao.selectById(categoryId)
-                .map(CategoryEntity::getName)
-                .orElse("不明なカテゴリです");
-    }
 }

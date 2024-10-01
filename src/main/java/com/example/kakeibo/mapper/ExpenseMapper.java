@@ -15,6 +15,5 @@ public abstract class ExpenseMapper {
     @Autowired
     protected CategoryService categoryService;
 
-    @Mapping(target = "categoryName", expression = "java(categoryService.getCategoryName(expenseEntity.getCategoryId()))")
     public abstract ExpenseDto toDto(ExpenseEntity expenseEntity);
 }
