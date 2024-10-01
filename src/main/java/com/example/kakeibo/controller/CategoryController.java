@@ -72,7 +72,6 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> delete(@PathVariable Integer categoryId) {
         try {
             categoryService.delete(categoryId);
-            return ResponseEntity.noContent().build();
         } catch (CategoryDeletionException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new CategoryErrorDto(e.getMessage()));
