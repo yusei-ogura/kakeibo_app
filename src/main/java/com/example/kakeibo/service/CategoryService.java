@@ -71,8 +71,8 @@ public class CategoryService {
      * @param categoryId カテゴリーID
      */
     public CategoryEntity findCategoryById(Integer categoryId) {
-        Optional<CategoryEntity> category = categoryDao.selectById(categoryId);
-        return category.orElseThrow(() -> new IllegalArgumentException("選択されたカテゴリが存在しません"));
+        return categoryDao.selectById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("選択されたカテゴリが存在しません"));
     }
 
     /**
@@ -81,7 +81,8 @@ public class CategoryService {
      * @return カテゴリー名
      */
     public String getCategoryName(Integer categoryId) {
-        CategoryEntity category = categoryDao.selectById(categoryId);
-        return (category != null && !category.isDeleteFlg()) ? category.getName() : "不明なカテゴリです";
+        return categoryDao.selectById(categoryId)
+                .map(CategoryEntity::getName)
+                .orElse("不明なカテゴリです");
     }
 }
