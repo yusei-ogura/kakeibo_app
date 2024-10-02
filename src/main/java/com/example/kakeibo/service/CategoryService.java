@@ -32,7 +32,7 @@ public class CategoryService {
         return categoryList.stream()
                 .filter(category -> !category.isDeleteFlg())
                 .map(categoryMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
