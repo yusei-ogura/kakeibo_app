@@ -3,9 +3,12 @@ package com.example.kakeibo.controller;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.InvalidYearMonthException;
-import com.example.kakeibo.response.ExpenseResponse;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
+import com.example.kakeibo.response.ApiResponse;
+import com.example.kakeibo.response.ExpenseResponse;
+import com.example.kakeibo.response.errorDto.ExpenseErrorDto;
+import com.example.kakeibo.response.successDto.ExpenseSuccessDto;
 import com.example.kakeibo.service.ExpenseService;
 import com.example.kakeibo.util.DateUtil;
 import com.example.kakeibo.util.ValidationErrorUtil;
@@ -25,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -43,9 +45,9 @@ public class ExpenseController {
      * @return 支出リスト
      */
     @GetMapping
-    public ResponseEntity<Object> getExpensesByMonth(@RequestParam String yearMonth) {
+    public ResponseEntity<ApiResponse> getExpensesByMonth(@RequestParam String yearMonth) {
         if (StringUtils.isEmpty(yearMonth)) {
-            return ResponseEntity.badRequest().body("対象月を入力してください");
+            return ResponseEntity.badRequest().body(new ExpenseErrorDto("対象月を入力してください"));
         }
 
         try {
@@ -54,9 +56,9 @@ public class ExpenseController {
             ExpenseResponse response = expenseService.createExpenseResponse(expenseListDto);
             return ResponseEntity.ok(response);
         } catch (InvalidYearMonthException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ExpenseErrorDto(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExpenseErrorDto("サーバーエラーが発生しました"));
         }
     }
 
@@ -66,17 +68,17 @@ public class ExpenseController {
      * @return 登録結果
      */
     @PostMapping
-    public ResponseEntity<String> register(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody ExpenseRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
-            return ResponseEntity.badRequest().body("【エラー】\n" + errorMessage);
+            return ResponseEntity.badRequest().body(new ExpenseErrorDto("【エラー】" + errorMessage));
         }
 
         try {
             expenseService.register(request);
-            return ResponseEntity.ok("支出が登録されました");
+            return ResponseEntity.ok(new ExpenseSuccessDto("支出が登録されました"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExpenseErrorDto("サーバーエラーが発生しました"));
         }
     }
 
@@ -86,18 +88,19 @@ public class ExpenseController {
      * @param request リクエストボディ：支出編集情報
      */
     @PutMapping("/{expenseId}")
-    public void edit(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
+    public ResponseEntity<ApiResponse> edit(@PathVariable Integer expenseId, @Valid @RequestBody ExpenseEditRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "【エラー】\n" + errorMessage);
+            return ResponseEntity.badRequest().body(new ExpenseErrorDto("【エラー】" + errorMessage));
         }
 
         try {
             expenseService.edit(expenseId, request);
+            return ResponseEntity.ok(new ExpenseSuccessDto("支出が編集されました"));
         } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExpenseErrorDto(e.getMessage()));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExpenseErrorDto("サーバーエラーが発生しました"));
         }
     }
 
@@ -106,15 +109,14 @@ public class ExpenseController {
      * @param expenseId 支出ID
      */
     @DeleteMapping("/{expenseId}")
-    public void delete(@PathVariable Integer expenseId) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable Integer expenseId) {
         try {
             expenseService.delete(expenseId);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (ExpenseDeletionException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException | ExpenseDeletionException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExpenseErrorDto(e.getMessage()));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "サーバーエラーが発生しました");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExpenseErrorDto("サーバーエラーが発生しました"));
         }
     }
 

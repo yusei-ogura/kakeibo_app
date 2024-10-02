@@ -6,17 +6,17 @@ import com.example.kakeibo.entity.ExpenseEntity;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.ExpenseEditException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
-import com.example.kakeibo.response.CategoryResponse;
-import com.example.kakeibo.response.ExpenseResponse;
-import com.example.kakeibo.response.ItemResponse;
 import com.example.kakeibo.mapper.ExpenseMapper;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
+import com.example.kakeibo.response.CategoryResponse;
+import com.example.kakeibo.response.ExpenseResponse;
+import com.example.kakeibo.response.ItemResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -52,18 +52,19 @@ public class ExpenseService {
      * @param request 支出登録リクエスト
      */
     public void register(ExpenseRegisterRequest request) {
-        categoryService.findCategoryById(request.getCategoryId());
 
-        ExpenseEntity entity = new ExpenseEntity();
-        entity.setAmount(request.getAmount());
-        entity.setCategoryId(request.getCategoryId());
-        entity.setMemo(request.getMemo());
-        entity.setPaymentDate(request.getPaymentDate());
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
+        try {
+            ExpenseEntity entity = new ExpenseEntity();
+            entity.setAmount(request.getAmount());
+            entity.setCategoryId(request.getCategoryId());
+            entity.setCategoryName(categoryService.findCategoryById(request.getCategoryId()).getName());
+            entity.setMemo(request.getMemo());
+            entity.setPaymentDate(request.getPaymentDate());
+            entity.setCreatedAt(LocalDateTime.now());
+            entity.setUpdatedAt(LocalDateTime.now());
 
-        int result = expenseDao.insert(entity);
-        if (result <= 0) {
+            expenseDao.insert(entity);
+        } catch (DataAccessException e) {
             throw new ExpenseRegistrationException("支出の登録に失敗しました");
         }
     }
@@ -76,16 +77,17 @@ public class ExpenseService {
     public void edit(Integer expenseId, ExpenseEditRequest request) {
         categoryService.findCategoryById(request.getCategoryId());
 
-        ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
-                .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
-        existingEntity.setAmount(request.getAmount());
-        existingEntity.setCategoryId(request.getCategoryId());
-        existingEntity.setMemo(request.getMemo());
-        existingEntity.setPaymentDate(request.getPaymentDate());
-        existingEntity.setUpdatedAt(LocalDateTime.now());
+        try {
+            ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
+                    .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
+            existingEntity.setAmount(request.getAmount());
+            existingEntity.setCategoryId(request.getCategoryId());
+            existingEntity.setMemo(request.getMemo());
+            existingEntity.setPaymentDate(request.getPaymentDate());
+            existingEntity.setUpdatedAt(LocalDateTime.now());
 
-        int result = expenseDao.update(existingEntity);
-        if (result <= 0) {
+            expenseDao.update(existingEntity);
+        } catch (DataAccessException e) {
             throw new ExpenseEditException("支出の編集に失敗しました");
         }
     }
@@ -95,10 +97,11 @@ public class ExpenseService {
      * @param expenseId 支出ID
      */
     public void delete(Integer expenseId) {
-        ExpenseEntity entity = new ExpenseEntity();
-        entity.setExpenseId(expenseId);
-        int result = expenseDao.delete(entity);
-        if (result <= 0) {
+        try {
+            ExpenseEntity entity = new ExpenseEntity();
+            entity.setExpenseId(expenseId);
+            expenseDao.delete(entity);
+        } catch (DataAccessException e) {
             throw new ExpenseDeletionException("支出の削除に失敗しました");
         }
     }

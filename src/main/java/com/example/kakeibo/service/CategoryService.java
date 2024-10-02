@@ -9,6 +9,7 @@ import com.example.kakeibo.exception.ExpenseRegistrationException;
 import com.example.kakeibo.mapper.CategoryMapper;
 import com.example.kakeibo.request.CategoryRegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,15 +39,16 @@ public class CategoryService {
      * @param request カテゴリー登録リクエスト
      */
     public void register(CategoryRegisterRequest request) {
-        CategoryEntity entity = new CategoryEntity();
-        entity.setName(request.getName());
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
-        entity.setDeleteFlg(false);
+        try {
+            CategoryEntity entity = new CategoryEntity();
+            entity.setName(request.getName());
+            entity.setCreatedAt(LocalDateTime.now());
+            entity.setUpdatedAt(LocalDateTime.now());
+            entity.setDeleteFlg(false);
 
-        int result = categoryDao.insert(entity);
-        if (result <= 0) {
-            throw new ExpenseRegistrationException("支出の登録に失敗しました");
+            categoryDao.insert(entity);
+        } catch (DataAccessException e) {
+            throw new ExpenseRegistrationException("カテゴリーの登録に失敗しました");
         }
     }
 
@@ -55,11 +57,11 @@ public class CategoryService {
      * @param categoryId カテゴリーID
      */
     public void delete(Integer categoryId) {
-        CategoryEntity entity = findCategoryById(categoryId);
-        entity.setDeleteFlg(true);
-        int result = categoryDao.updateDeleteFlg(entity);
-
-        if (result <= 0) {
+        try {
+            CategoryEntity entity = findCategoryById(categoryId);
+            entity.setDeleteFlg(true);
+            categoryDao.updateDeleteFlg(entity);
+        } catch (DataAccessException e) {
             throw new CategoryDeletionException("カテゴリーの削除に失敗しました");
         }
     }

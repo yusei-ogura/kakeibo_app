@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class CategoryErrorDto implements ApiResponse {
+public class ExpenseErrorDto implements ApiResponse {
     @JsonProperty("message")
     private String message;
+
 }

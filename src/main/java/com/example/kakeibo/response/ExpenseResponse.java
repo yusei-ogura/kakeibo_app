@@ -9,7 +9,7 @@ import java.util.Map;
  * 支出一覧Response
  */
 @Getter
-public class ExpenseResponse {
+public class ExpenseResponse implements ApiResponse {
     private Integer totalAmount;
     private Map<String, CategoryResponse> categories;
 

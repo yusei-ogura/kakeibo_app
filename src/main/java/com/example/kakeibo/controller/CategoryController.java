@@ -6,6 +6,7 @@ import com.example.kakeibo.request.CategoryRegisterRequest;
 import com.example.kakeibo.response.ApiResponse;
 import com.example.kakeibo.response.CategoryListResponse;
 import com.example.kakeibo.response.errorDto.CategoryErrorDto;
+import com.example.kakeibo.response.successDto.CategorySuccessDto;
 import com.example.kakeibo.service.CategoryService;
 import com.example.kakeibo.util.ValidationErrorUtil;
 import jakarta.validation.Valid;
@@ -54,12 +55,12 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> register(@Valid @RequestBody CategoryRegisterRequest request, BindingResult result) {
         String errorMessage = ValidationErrorUtil.formatErrorMessages(result);
         if (!errorMessage.isEmpty()) {
-            return ResponseEntity.badRequest().body(new CategoryErrorDto("【エラー】\n" + errorMessage));
+            return ResponseEntity.badRequest().body(new CategoryErrorDto("【エラー】" + errorMessage));
         }
 
         try {
             categoryService.register(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CategoryErrorDto("カテゴリーが登録されました"));
+            return ResponseEntity.ok(new CategorySuccessDto("カテゴリーが登録されました"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
