@@ -4,7 +4,7 @@ import com.example.kakeibo.dao.CategoryDao;
 import com.example.kakeibo.dto.CategoryDto;
 import com.example.kakeibo.entity.CategoryEntity;
 import com.example.kakeibo.exception.CategoryDeletionException;
-import com.example.kakeibo.exception.ExpenseDeletionException;
+import com.example.kakeibo.exception.CategoryNotFoundException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
 import com.example.kakeibo.mapper.CategoryMapper;
 import com.example.kakeibo.request.CategoryRegisterRequest;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +70,7 @@ public class CategoryService {
      */
     public CategoryEntity findCategoryById(Integer categoryId) {
         return categoryDao.selectById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("選択されたカテゴリが存在しません"));
+                .orElseThrow(() -> new CategoryNotFoundException("選択されたカテゴリが存在しません"));
     }
 
 }
