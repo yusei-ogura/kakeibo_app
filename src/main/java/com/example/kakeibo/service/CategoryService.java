@@ -57,11 +57,11 @@ public class CategoryService {
      * @param categoryId カテゴリーID
      */
     public void delete(Integer categoryId) {
-        try {
             CategoryEntity entity = findCategoryById(categoryId);
             entity.setDeleteFlg(true);
-            categoryDao.updateDeleteFlg(entity);
-        } catch (DataAccessException e) {
+            int result = categoryDao.updateDeleteFlg(entity);
+
+            if (result != 1) {
             throw new CategoryDeletionException("カテゴリーの削除に失敗しました");
         }
     }

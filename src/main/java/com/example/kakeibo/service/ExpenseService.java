@@ -77,7 +77,6 @@ public class ExpenseService {
     public void edit(Integer expenseId, ExpenseEditRequest request) {
         categoryService.findCategoryById(request.getCategoryId());
 
-        try {
             ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
                     .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
             existingEntity.setAmount(request.getAmount());
@@ -86,8 +85,8 @@ public class ExpenseService {
             existingEntity.setPaymentDate(request.getPaymentDate());
             existingEntity.setUpdatedAt(LocalDateTime.now());
 
-            expenseDao.update(existingEntity);
-        } catch (DataAccessException e) {
+            int result = expenseDao.update(existingEntity);
+            if (result != 1) {
             throw new ExpenseEditException("支出の編集に失敗しました");
         }
     }
@@ -97,11 +96,10 @@ public class ExpenseService {
      * @param expenseId 支出ID
      */
     public void delete(Integer expenseId) {
-        try {
             ExpenseEntity entity = new ExpenseEntity();
             entity.setExpenseId(expenseId);
-            expenseDao.delete(entity);
-        } catch (DataAccessException e) {
+            int result = expenseDao.delete(entity);
+            if (result != 1) {
             throw new ExpenseDeletionException("支出の削除に失敗しました");
         }
     }
