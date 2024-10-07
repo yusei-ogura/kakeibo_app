@@ -9,9 +9,9 @@ import com.example.kakeibo.exception.ExpenseRegistrationException;
 import com.example.kakeibo.mapper.ExpenseMapper;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
-import com.example.kakeibo.response.CategoryResponse;
-import com.example.kakeibo.response.ExpenseResponse;
-import com.example.kakeibo.response.ItemResponse;
+import com.example.kakeibo.response.CategoryExpenseElem;
+import com.example.kakeibo.response.ExpenseDetail;
+import com.example.kakeibo.response.MonthlyExpenseResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -77,16 +77,16 @@ public class ExpenseService {
     public void edit(Integer expenseId, ExpenseEditRequest request) {
         categoryService.findCategoryById(request.getCategoryId());
 
-            ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
-                    .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
-            existingEntity.setAmount(request.getAmount());
-            existingEntity.setCategoryId(request.getCategoryId());
-            existingEntity.setMemo(request.getMemo());
-            existingEntity.setPaymentDate(request.getPaymentDate());
-            existingEntity.setUpdatedAt(LocalDateTime.now());
+        ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
+                .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
+        existingEntity.setAmount(request.getAmount());
+        existingEntity.setCategoryId(request.getCategoryId());
+        existingEntity.setMemo(request.getMemo());
+        existingEntity.setPaymentDate(request.getPaymentDate());
+        existingEntity.setUpdatedAt(LocalDateTime.now());
 
-            int result = expenseDao.update(existingEntity);
-            if (result != 1) {
+        int result = expenseDao.update(existingEntity);
+        if (result != 1) {
             throw new ExpenseEditException("支出の編集に失敗しました");
         }
     }
@@ -96,32 +96,53 @@ public class ExpenseService {
      * @param expenseId 支出ID
      */
     public void delete(Integer expenseId) {
-            ExpenseEntity entity = new ExpenseEntity();
-            entity.setExpenseId(expenseId);
-            int result = expenseDao.delete(entity);
-            if (result != 1) {
+        ExpenseEntity entity = new ExpenseEntity();
+        entity.setExpenseId(expenseId);
+        int result = expenseDao.delete(entity);
+        if (result != 1) {
             throw new ExpenseDeletionException("支出の削除に失敗しました");
         }
     }
 
     /**
-     * 支出Dtoを基に支出一覧Responseを生成する
-     * @param expenseListDto 支出Dto
-     * @return 支出一覧Response
+     * カテゴリー毎の支出を生成する
+     * @param expenseListDto 支出Dtoリスト
+     * @return カテゴリー毎の支出リスト
      */
-    public ExpenseResponse createExpenseResponse(List<ExpenseDto> expenseListDto) {
-        Map<String, CategoryResponse> categoryMap = new HashMap<>();
-        Integer totalAmount = 0;
+    public Map<String, CategoryExpenseElem> getCategoryExpenses(List<ExpenseDto> expenseListDto) {
+        Map<String, CategoryExpenseElem> categoryMap = new HashMap<>();
 
         for (ExpenseDto dto : expenseListDto) {
             String categoryName = dto.getCategoryName();
-            CategoryResponse categoryForm = categoryMap.computeIfAbsent(categoryName, k -> new CategoryResponse(0, new ArrayList<>()));
             Integer amount = dto.getAmount();
-            categoryForm.setTotalAmount(categoryForm.getTotalAmount() + amount);
-            categoryForm.getItems().add(new ItemResponse(dto.getExpenseId(), dto.getMemo(), amount));
-            totalAmount += amount;
+
+            CategoryExpenseElem categoryElem = categoryMap.get(categoryName);
+            if (categoryElem == null) {
+                categoryElem = new CategoryExpenseElem(categoryName, 0, new ArrayList<>());
+                categoryMap.put(categoryName, categoryElem);
+            }
+            categoryElem.setTotalAmount(categoryElem.getTotalAmount() + amount);
+            categoryElem.getExpenseDetails().add(new ExpenseDetail(dto.getExpenseId(), dto.getMemo(), amount));
         }
-        return new ExpenseResponse(totalAmount, categoryMap);
+        return categoryMap;
     }
+
+    /**
+     * 支出Dtoを基に支出一覧Responseを生成する
+     * @param expenseListDto 支出Dtoリスト
+     * @return 月別支出Response
+     */
+    public MonthlyExpenseResponse createMonthlyExpenseResponse(List<ExpenseDto> expenseListDto) {
+        Map<String, CategoryExpenseElem> categoryExpensesMap = getCategoryExpenses(expenseListDto);
+
+        Integer totalAmount = categoryExpensesMap.values().stream()
+                .mapToInt(CategoryExpenseElem::getTotalAmount)
+                .sum();
+
+        List<CategoryExpenseElem> categoryExpenses = new ArrayList<>(categoryExpensesMap.values());
+
+        return new MonthlyExpenseResponse(totalAmount, categoryExpenses);
+    }
+
 
 }

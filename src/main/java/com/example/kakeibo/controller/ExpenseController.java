@@ -6,7 +6,7 @@ import com.example.kakeibo.exception.InvalidYearMonthException;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.response.ApiResponse;
-import com.example.kakeibo.response.ExpenseResponse;
+import com.example.kakeibo.response.MonthlyExpenseResponse;
 import com.example.kakeibo.response.errorDto.ExpenseErrorDto;
 import com.example.kakeibo.response.successDto.ExpenseSuccessDto;
 import com.example.kakeibo.service.ExpenseService;
@@ -45,7 +45,7 @@ public class ExpenseController {
      * @return 支出リスト
      */
     @GetMapping
-    public ResponseEntity<ApiResponse> getExpensesByMonth(@RequestParam String yearMonth) {
+    public ResponseEntity<ApiResponse> getMonthlyExpenses(@RequestParam String yearMonth) {
         if (StringUtils.isEmpty(yearMonth)) {
             return ResponseEntity.badRequest().body(new ExpenseErrorDto("対象月を入力してください"));
         }
@@ -53,7 +53,7 @@ public class ExpenseController {
         try {
             YearMonth targetMonth = DateUtil.parseYearMonth(yearMonth);
             List<ExpenseDto> expenseListDto = expenseService.findExpensesByMonth(targetMonth);
-            ExpenseResponse response = expenseService.createExpenseResponse(expenseListDto);
+            MonthlyExpenseResponse response = expenseService.createMonthlyExpenseResponse(expenseListDto);
             return ResponseEntity.ok(response);
         } catch (InvalidYearMonthException e) {
             return ResponseEntity.badRequest().body(new ExpenseErrorDto(e.getMessage()));
