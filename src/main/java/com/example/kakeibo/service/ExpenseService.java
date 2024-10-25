@@ -40,11 +40,23 @@ public class ExpenseService {
     public List<ExpenseDto> findExpensesByMonth(YearMonth targetMonth) {
         int year = targetMonth.getYear();
         int month = targetMonth.getMonthValue();
-
         List<ExpenseEntity> expenseList = expenseDao.selectByYearAndMonth(year, month);
-        return expenseList.stream()
-                .map(expenseMapper::toDto)
-                .toList();
+
+        List<ExpenseDto> expenseDto = new ArrayList<>();
+        for (ExpenseEntity expense : expenseList) {
+            ExpenseDto dto = new ExpenseDto();
+            dto.setExpenseId(expense.getExpenseId());
+            dto.setAmount(expense.getAmount());
+            dto.setCategoryId(expense.getCategoryId());
+            dto.setCategoryName(categoryService.findCategoryById(expense.getCategoryId()).getName());
+            dto.setMemo(expense.getMemo());
+            dto.setPaymentDate(expense.getPaymentDate());
+            dto.setCreatedAt(expense.getCreatedAt());
+            dto.setUpdatedAt(expense.getUpdatedAt());
+
+            expenseDto.add(dto);
+        }
+        return expenseDto;
     }
 
     /**
@@ -57,7 +69,6 @@ public class ExpenseService {
             ExpenseEntity entity = new ExpenseEntity();
             entity.setAmount(request.getAmount());
             entity.setCategoryId(request.getCategoryId());
-            entity.setCategoryName(categoryService.findCategoryById(request.getCategoryId()).getName());
             entity.setMemo(request.getMemo());
             entity.setPaymentDate(request.getPaymentDate());
             entity.setCreatedAt(LocalDateTime.now());

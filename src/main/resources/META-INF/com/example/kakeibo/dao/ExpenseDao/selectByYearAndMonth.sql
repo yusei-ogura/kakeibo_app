@@ -2,7 +2,6 @@ SELECT
     e.expense_id,
     e.amount,
     e.category_id,
-    c.name AS category_name,
     e.memo,
     e.payment_date,
     e.created_at,

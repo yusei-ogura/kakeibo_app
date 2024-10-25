@@ -31,10 +31,6 @@ public class ExpenseEntity {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    /** カテゴリー名 */
-    @Column(name = "category_name")
-    private String categoryName;
-
     /** メモ */
     @Column(name = "memo")
     private String memo;
@@ -73,14 +69,6 @@ public class ExpenseEntity {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
     }
 
     public String getMemo() {
