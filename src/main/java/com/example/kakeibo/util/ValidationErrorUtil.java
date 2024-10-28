@@ -10,7 +10,7 @@ public class ValidationErrorUtil {
             return result.getAllErrors().stream()
                     .map(error -> "・" + error.getDefaultMessage())
                     .distinct()
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining());
         }
         return "";
     }
