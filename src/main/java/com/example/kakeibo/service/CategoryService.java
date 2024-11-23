@@ -1,13 +1,13 @@
 package com.example.kakeibo.service;
 
 import com.example.kakeibo.dao.CategoryDao;
+import com.example.kakeibo.dto.CategoryCommandDto;
 import com.example.kakeibo.dto.CategoryDto;
 import com.example.kakeibo.entity.CategoryEntity;
 import com.example.kakeibo.exception.CategoryDeletionException;
 import com.example.kakeibo.exception.CategoryNotFoundException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
 import com.example.kakeibo.mapper.CategoryMapper;
-import com.example.kakeibo.request.CategoryRegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -36,12 +36,12 @@ public class CategoryService {
 
     /**
      * カテゴリーを登録する
-     * @param request カテゴリー登録リクエスト
+     * commandDto カテゴリー情報Dto
      */
-    public void register(CategoryRegisterRequest request) {
+    public void register(CategoryCommandDto commandDto) {
         try {
             CategoryEntity entity = new CategoryEntity();
-            entity.setName(request.getName());
+            entity.setName(commandDto.getName());
             entity.setCreatedAt(LocalDateTime.now());
             entity.setUpdatedAt(LocalDateTime.now());
             entity.setDeleteFlg(false);
