@@ -1,6 +1,7 @@
 package com.example.kakeibo.service;
 
 import com.example.kakeibo.dao.ExpenseDao;
+import com.example.kakeibo.dto.ExpenseCommandDto;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.entity.ExpenseEntity;
 import com.example.kakeibo.exception.ExpenseDeletionException;
@@ -61,16 +62,16 @@ public class ExpenseService {
 
     /**
      * 支出を登録する
-     * @param request 支出登録リクエスト
+     * commandDto 支出情報Dto
      */
-    public void register(ExpenseRegisterRequest request) {
+    public void register(ExpenseCommandDto commandDto) {
 
         try {
             ExpenseEntity entity = new ExpenseEntity();
-            entity.setAmount(request.getAmount());
-            entity.setCategoryId(request.getCategoryId());
-            entity.setMemo(request.getMemo());
-            entity.setPaymentDate(request.getPaymentDate());
+            entity.setAmount(commandDto.getAmount());
+            entity.setCategoryId(commandDto.getCategoryId());
+            entity.setMemo(commandDto.getMemo());
+            entity.setPaymentDate(commandDto.getPaymentDate());
             entity.setCreatedAt(LocalDateTime.now());
             entity.setUpdatedAt(LocalDateTime.now());
 
@@ -83,17 +84,17 @@ public class ExpenseService {
     /**
      * 支出を編集する
      * @param expenseId 支出ID
-     * @param request 支出編集リクエスト
+     * commandDto 支出情報Dto
      */
-    public void edit(Integer expenseId, ExpenseEditRequest request) {
-        categoryService.findCategoryById(request.getCategoryId());
+    public void edit(Integer expenseId, ExpenseCommandDto commandDto) {
+        categoryService.findCategoryById(commandDto.getCategoryId());
 
         ExpenseEntity existingEntity = expenseDao.selectById(expenseId)
                 .orElseThrow(() -> new EntityNotFoundException("支出が見つかりません"));
-        existingEntity.setAmount(request.getAmount());
-        existingEntity.setCategoryId(request.getCategoryId());
-        existingEntity.setMemo(request.getMemo());
-        existingEntity.setPaymentDate(request.getPaymentDate());
+        existingEntity.setAmount(commandDto.getAmount());
+        existingEntity.setCategoryId(commandDto.getCategoryId());
+        existingEntity.setMemo(commandDto.getMemo());
+        existingEntity.setPaymentDate(commandDto.getPaymentDate());
         existingEntity.setUpdatedAt(LocalDateTime.now());
 
         int result = expenseDao.update(existingEntity);

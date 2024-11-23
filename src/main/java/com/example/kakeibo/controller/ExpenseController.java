@@ -1,5 +1,6 @@
 package com.example.kakeibo.controller;
 
+import com.example.kakeibo.dto.ExpenseCommandDto;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.InvalidYearMonthException;
@@ -75,7 +76,8 @@ public class ExpenseController {
         }
 
         try {
-            expenseService.register(request);
+            ExpenseCommandDto commandDto = ExpenseCommandDto.from(request);
+            expenseService.register(commandDto);
             return ResponseEntity.ok(new ExpenseSuccessDto("支出が登録されました"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExpenseErrorDto("サーバーエラーが発生しました"));
@@ -95,7 +97,8 @@ public class ExpenseController {
         }
 
         try {
-            expenseService.edit(expenseId, request);
+            ExpenseCommandDto commandDto = ExpenseCommandDto.from(request);
+            expenseService.edit(expenseId, commandDto);
             return ResponseEntity.ok(new ExpenseSuccessDto("支出が編集されました"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExpenseErrorDto(e.getMessage()));

@@ -1,5 +1,6 @@
 package com.example.kakeibo.controller;
 
+import com.example.kakeibo.dto.CategoryCommandDto;
 import com.example.kakeibo.dto.CategoryDto;
 import com.example.kakeibo.exception.CategoryDeletionException;
 import com.example.kakeibo.request.CategoryRegisterRequest;
@@ -59,7 +60,8 @@ public class CategoryController {
         }
 
         try {
-            categoryService.register(request);
+            CategoryCommandDto commandDto = CategoryCommandDto.from(request);
+            categoryService.register(commandDto);
             return ResponseEntity.ok(new CategorySuccessDto("カテゴリーが登録されました"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
