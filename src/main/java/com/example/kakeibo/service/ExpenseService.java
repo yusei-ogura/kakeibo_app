@@ -139,21 +139,14 @@ public class ExpenseService {
     }
 
     /**
-     * 支出Dtoを基に支出一覧Responseを生成する
-     * @param expenseListDto 支出Dtoリスト
-     * @return 月別支出Response
+     * カテゴリー毎の支出の総額を計算する
+     * @param categoryExpensesMap カテゴリー別の支出情報
+     * @return カテゴリー全体の総額
      */
-    public MonthlyExpenseResponse createMonthlyExpenseResponse(List<ExpenseDto> expenseListDto) {
-        Map<String, CategoryExpenseElem> categoryExpensesMap = getCategoryExpenses(expenseListDto);
-
-        Integer totalAmount = categoryExpensesMap.values().stream()
+    public Integer calculateTotalAmount(Map<String, CategoryExpenseElem> categoryExpensesMap) {
+        return categoryExpensesMap.values().stream()
                 .mapToInt(CategoryExpenseElem::getTotalAmount)
                 .sum();
-
-        List<CategoryExpenseElem> categoryExpenses = new ArrayList<>(categoryExpensesMap.values());
-
-        return new MonthlyExpenseResponse(totalAmount, categoryExpenses);
     }
-
 
 }
