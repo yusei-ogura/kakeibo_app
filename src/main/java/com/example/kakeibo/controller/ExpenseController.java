@@ -7,6 +7,7 @@ import com.example.kakeibo.exception.InvalidYearMonthException;
 import com.example.kakeibo.request.ExpenseEditRequest;
 import com.example.kakeibo.request.ExpenseRegisterRequest;
 import com.example.kakeibo.response.ApiResponse;
+import com.example.kakeibo.response.CategoryExpenseElem;
 import com.example.kakeibo.response.MonthlyExpenseResponse;
 import com.example.kakeibo.response.errorDto.ExpenseErrorDto;
 import com.example.kakeibo.response.successDto.ExpenseSuccessDto;
@@ -31,7 +32,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,9 +55,11 @@ public class ExpenseController {
         }
 
         try {
-            YearMonth targetMonth = DateUtil.parseYearMonth(yearMonth);
-            List<ExpenseDto> expenseListDto = expenseService.findExpensesByMonth(targetMonth);
-            MonthlyExpenseResponse response = expenseService.createMonthlyExpenseResponse(expenseListDto);
+            List<ExpenseDto> expenseList = expenseService.findExpensesByMonth(YearMonth.parse(yearMonth));
+            Map<String, CategoryExpenseElem> categoryExpensesMap = expenseService.getCategoryExpenses(expenseList);
+            Integer totalAmount = expenseService.calculateTotalAmount(categoryExpensesMap);
+            List<CategoryExpenseElem> categoryExpenses = new ArrayList<>(categoryExpensesMap.values());
+            MonthlyExpenseResponse response = new MonthlyExpenseResponse(totalAmount, categoryExpenses);
             return ResponseEntity.ok(response);
         } catch (InvalidYearMonthException e) {
             return ResponseEntity.badRequest().body(new ExpenseErrorDto(e.getMessage()));
