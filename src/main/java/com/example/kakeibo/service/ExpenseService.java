@@ -3,6 +3,7 @@ package com.example.kakeibo.service;
 import com.example.kakeibo.dao.ExpenseDao;
 import com.example.kakeibo.dto.ExpenseDto;
 import com.example.kakeibo.entity.ExpenseEntity;
+import com.example.kakeibo.entity.CategoryEntity;
 import com.example.kakeibo.exception.ExpenseDeletionException;
 import com.example.kakeibo.exception.ExpenseEditException;
 import com.example.kakeibo.exception.ExpenseRegistrationException;
@@ -17,12 +18,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,25 +41,31 @@ public class ExpenseService {
      * @return 支出リストのDTO
      */
     public List<ExpenseDto> findExpensesByMonth(YearMonth targetMonth) {
-        int year = targetMonth.getYear();
-        int month = targetMonth.getMonthValue();
-        List<ExpenseEntity> expenseList = expenseDao.selectByYearAndMonth(year, month);
+        LocalDate fromDate = targetMonth.atDay(1);
+        LocalDate toDate = fromDate.plusMonths(1);
+        List<ExpenseEntity> expenseList = expenseDao.selectByDateRange(fromDate, toDate);
 
         List<ExpenseDto> expenseDto = new ArrayList<>();
+
+        Map<Integer, String> categoryMap = categoryService.findCategoryByIds(categoryIds).stream()
+                .collect(Collectors.toMap(CategoryEntity::getCategoryId, CategoryEntity::getName));
+
+        // DTOの生成
+        List<ExpenseDto> expenseDtoList = new ArrayList<>();
         for (ExpenseEntity expense : expenseList) {
             ExpenseDto dto = new ExpenseDto();
             dto.setExpenseId(expense.getExpenseId());
             dto.setAmount(expense.getAmount());
             dto.setCategoryId(expense.getCategoryId());
-            dto.setCategoryName(categoryService.findCategoryById(expense.getCategoryId()).getName());
+            dto.setCategoryName(categoryMap.get(expense.getCategoryId()));
             dto.setMemo(expense.getMemo());
             dto.setPaymentDate(expense.getPaymentDate());
             dto.setCreatedAt(expense.getCreatedAt());
             dto.setUpdatedAt(expense.getUpdatedAt());
 
-            expenseDto.add(dto);
+            expenseDtoList.add(dto);
         }
-        return expenseDto;
+        return expenseDtoList;
     }
 
     /**

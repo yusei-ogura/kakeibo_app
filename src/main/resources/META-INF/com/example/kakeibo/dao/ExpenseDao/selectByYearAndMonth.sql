@@ -11,6 +11,6 @@ FROM
 INNER JOIN
     kakeibo.category c ON e.category_id = c.category_id
 WHERE
-    e.payment_date >= '2024-08-01'
-    AND e.payment_date < '2024-09-01'
+    e.payment_date >= /* fromDate */'2024-08-01'
+    AND e.payment_date < /* toDate */'2024-09-01'
     AND c.delete_flg = false
